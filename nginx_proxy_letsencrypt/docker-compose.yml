@@ -1,0 +1,50 @@
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+    networks:
+      - proxy-network
+    restart: always
+
+  letsencrypt:
+    image: nginxproxy/acme-companion
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs:rw
+    environment:
+      DEFAULT_EMAIL: man.kochetkova@yandex.ru
+      NGINX_PROXY_CONTAINER: nginx-proxy
+    networks:
+      - proxy-network
+    restart: always
+
+  whoami1:
+    image: containous/whoami
+    environment:
+      VIRTUAL_HOST: xdemo1.xianle.ru
+      LETSENCRYPT_HOST: xdemo1.xianle.ru
+      LETSENCRYPT_EMAIL: man.kochetkova@yandex.ru
+    networks:
+      - proxy-network
+    restart: always
+
+  whoami2:
+    image: containous/whoami
+    environment:
+      VIRTUAL_HOST: xdemo2.xianle.ru
+      LETSENCRYPT_HOST: xdemo2.xianle.ru
+      LETSENCRYPT_EMAIL: man.kochetkova@yandex.ru
+    networks:
+      - proxy-network
+    restart: always
+
+networks:
+  proxy-network:
+    driver: bridge
