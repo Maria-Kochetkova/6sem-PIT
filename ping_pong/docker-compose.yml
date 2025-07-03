@@ -1,0 +1,18 @@
+services:
+  pingpong1:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - RESPONSE=Pong from Service 1 (PORT 3001)
+    restart: always
+
+  pingpong2:
+    build: .
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - RESPONSE=Pong from Service 2 (PORT 3002)
+    restart: always
